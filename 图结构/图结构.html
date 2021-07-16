@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="dict.js"></script>
+    <script>
+        function Graph(){
+// 属性：顶点（数组）   边（字典）
+           this.vertexes = []
+           this.edges = new Dictionary()
+
+// 方法
+
+// 添加方法
+// 1添加顶点
+Graph.prototype.addVertex = function(v){
+    this.vertexes.push(v)
+    this.edges.set(v,[])
+}
+// 2添加边
+Graph.prototype.addEdge = function(v1,v2){
+    // 一个有向，两个无向
+    this.edges.get(v1).push(v2)
+    this.edges.get(v2).push(v1)
+}       
+// 3.toString(不懂)
+Graph.prototype.toString = function(){
+    // 定义字符串，保存最终的结果
+    var resultString = ""
+    // 遍历所有的顶点，以及顶点对应的边(找出所有与该顶点相关联的顶点)
+    for(var i=0;i<this.vertexes.length;i++){
+        resultString+=this.vertexes[i]+'->'
+        var vEdges =this.edges.get(this.vertexes[i])
+        for(var j=0;j<vEdges.length;j++){
+            resultString += vEdges[j] + ' '
+        }
+        resultString +='\n'
+    }
+    return resultString
+}
+// 4.初始化颜色状态
+Graph.prototype.initializeColor = function(){
+    var colors = []
+    for(var i=0;i<this.vertexes.length;i++){
+        colors[this.vertexes[i]]="white"
+    }
+    return colors
+}
+// bfs
+Graph.prototype.bfs = function(initV,handler){
+    var colors = this.initializeColor()
+    var queue =new Queue()
+    queue.enqueue(initV)
+
+    while(!queue.isEmpty()){
+        var v =queue.dequeue()
+        var vList = this.edges.get(v)
+        colors[v]="gray"
+        for(var i=0;i<vList.length;i++){
+            var e =vList[i]
+            if(colors[e]=="white"){
+                colors[e]="gray"
+                queue.enqueue(e)
+            }
+        }
+        handler(v)
+        colors[v]="black"
+    }
+}
+// dfs
+Graph.prototype.dfs = function(initV,handler){
+    // 初始化颜色
+    var colors = this.initializeColor()
+    // 从某个顶点开始递归访问
+    this.dfsVisit(initV,colors,handler)
+}
+Graph.prototype.dfsVisit = function(v,colors,handler){
+    // 将颜色设置未灰色
+    colors[v]="gray"
+    // 处理v顶点
+    handler(v)
+    // 访问v相连的顶点
+    var vList = this.edges.get(v)
+    for(var i=0;i<vList.length;i++){
+        var e  = vList[i]
+        if(colors[e] =="white"){
+            this.dfsVisit(e,colors,handler)
+        }
+    }
+    colors[v]="black"
+}
+}
+
+var graph =  new Graph() 
+// 添加顶点
+var myVertexes =["A" ,"B","C","D","E","F","G","H","I"]
+for(var i=0;i<myVertexes.length;i++){
+    graph.addVertex(myVertexes[i])
+}
+// 添加边
+graph.addEdge("A","B")
+graph.addEdge("A","C")
+graph.addEdge("A","D")
+graph.addEdge("C","D")
+graph.addEdge("C","G")
+graph.addEdge("D","G")
+graph.addEdge("D","H")
+graph.addEdge("B","E")
+graph.addEdge("B","F")
+graph.addEdge("E","I")
+alert(graph)
+
+
+var result =""
+graph.bfs(graph.vertexes[0],function(v){
+    result+=v+" "
+})
+alert(result)
+
+var result =""
+graph.dfs(graph.vertexes[0],function(v){
+    result+=v+" "
+})
+alert(result)
+</script>
+</body>
+</html>
